@@ -108,12 +108,7 @@ public final class Executable {
     static final class EchoCmd implements Cmd {
         @Override
         public void execute(CmdContext context) {
-            var it = context.argsIterator(1);
-            while (it.hasNext()) {
-                System.out.print(it.next());
-                if (it.hasNext()) System.out.print(' ');
-            }
-            System.out.println();
+            System.out.println(context.argsAsString().replaceAll("'", ""));
         }
     }
 
