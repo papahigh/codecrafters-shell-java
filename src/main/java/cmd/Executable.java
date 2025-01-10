@@ -113,28 +113,44 @@ public final class Executable {
 
         private String render(String input) {
             var sb = new StringBuilder();
-            boolean sQuotes = false, dQuotes = false, spaced = false;
+            boolean sQuotes = false, dQuotes = false, escape = false, spaced = false;
             for (char c : input.toCharArray()) {
-                if (Character.isWhitespace(c)) {
-                    if (!sQuotes && !dQuotes) {
-                        if (!spaced) {
+                switch (c) {
+                    case ' ': {
+                        if (!sQuotes && !dQuotes) {
+                            if (!spaced) {
+                                sb.append(c);
+                                spaced = true;
+                            }
+                        } else {
                             sb.append(c);
-                            spaced = true;
                         }
-                    } else {
-                        sb.append(c);
+                        break;
                     }
-                } else if (c == '"') {
-                    if (sQuotes) {
+                    case '"': {
+                        if (sQuotes || escape) {
+                            sb.append(c);
+                        } else dQuotes = !dQuotes;
+                        break;
+                    }
+                    case '\'': {
+                        if (dQuotes || escape) {
+                            sb.append(c);
+                        } else sQuotes = !sQuotes;
+                        break;
+                    }
+                    case '\\': {
+                        var inQuotes = dQuotes || sQuotes;
+                        if (escape || inQuotes) sb.append('\\');
+                        if (!inQuotes) escape = !escape;
+                        break;
+                    }
+                    default: {
                         sb.append(c);
-                    } else dQuotes = !dQuotes;
-                } else if (c == '\'') {
-                    if (dQuotes) {
-                        sb.append(c);
-                    } else sQuotes = !sQuotes;
-                } else {
-                    sb.append(c);
-                    spaced = false;
+                        spaced = false;
+                        escape = false;
+                        break;
+                    }
                 }
             }
             return sb.toString();

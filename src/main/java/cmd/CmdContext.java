@@ -28,8 +28,9 @@ public record CmdContext(String input, String[] args) {
 
         private final List<String> args = new ArrayList<>();
 
-        private State state = State.DEFAULT_PARSE;
         private StringBuilder sb = new StringBuilder();
+
+        private State state = State.DEFAULT_PARSE;
 
         private enum State {
             DEFAULT_PARSE,
