@@ -35,6 +35,14 @@ public final class Executable {
         void execute(CmdContext context) throws Exception;
     }
 
+    static final class PwdCmd implements Cmd {
+        @Override
+        public void execute(CmdContext context) {
+            Path pwd = Paths.get("").toAbsolutePath();
+            System.out.println(pwd);
+        }
+    }
+
     static final class RunCmd implements Cmd {
 
         @Override
@@ -103,7 +111,8 @@ public final class Executable {
         private static final Map<String, Cmd> REGISTRY = Map.of(
                 "exit", new ExitCmd(),
                 "echo", new EchoCmd(),
-                "type", new TypeCmd()
+                "type", new TypeCmd(),
+                "pwd", new PwdCmd()
         );
 
         public static Cmd getCmd(String command) {
