@@ -108,7 +108,11 @@ public final class Executable {
     static final class EchoCmd implements Cmd {
         @Override
         public void execute(CmdContext context) {
-            System.out.println(context.argsAsString().replaceAll("'", ""));
+            System.out.println(
+                    context.argsAsString()
+                            .replaceAll("'", "")
+                            .replaceAll("\\s+", "")
+            );
         }
     }
 
