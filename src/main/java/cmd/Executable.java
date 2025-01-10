@@ -38,8 +38,17 @@ public final class Executable {
     static final class PwdCmd implements Cmd {
         @Override
         public void execute(CmdContext context) {
-            Path pwd = Paths.get("").toAbsolutePath();
-            System.out.println(pwd);
+            Path curr = CmdState.INSTANCE.getOrDefault("PWD", Paths.get("").toAbsolutePath());
+            System.out.println(curr);
+        }
+    }
+
+    static final class CdCmd implements Cmd {
+        @Override
+        public void execute(CmdContext context) throws Exception {
+            Path curr = CmdState.INSTANCE.getOrDefault("PWD", Paths.get("").toAbsolutePath());
+            Path next = curr.resolve(context.arg(1));
+            CmdState.INSTANCE.put("PWD", next.toRealPath().toAbsolutePath());
         }
     }
 
@@ -112,7 +121,8 @@ public final class Executable {
                 "exit", new ExitCmd(),
                 "echo", new EchoCmd(),
                 "type", new TypeCmd(),
-                "pwd", new PwdCmd()
+                "pwd", new PwdCmd(),
+                "cd", new CdCmd()
         );
 
         public static Cmd getCmd(String command) {
