@@ -145,9 +145,13 @@ public final class Executable {
                         break;
                     }
                     case '\\': {
-                        var inQuotes = dQuotes || sQuotes;
-                        if (escape || inQuotes) sb.append('\\');
-                        if (!inQuotes) escape = !escape;
+                        if (dQuotes) {
+                            if (escape) sb.append('\\');
+                            escape = !escape;
+                        } else {
+                            if (escape || sQuotes) sb.append('\\');
+                            if (!sQuotes) escape = !escape;
+                        }
                         break;
                     }
                     default: {
