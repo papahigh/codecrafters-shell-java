@@ -128,6 +128,7 @@ public final class Executable {
                     quotes = !quotes;
                 } else {
                     sb.append(c);
+                    spaced = false;
                 }
             }
             return sb.toString();
