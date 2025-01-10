@@ -117,7 +117,7 @@ public final class Executable {
             for (char c : input.toCharArray()) {
                 switch (c) {
                     case ' ': {
-                        if (!sQuotes && !dQuotes) {
+                        if (!sQuotes && !dQuotes && !escape) {
                             if (!spaced) {
                                 sb.append(c);
                                 spaced = true;
