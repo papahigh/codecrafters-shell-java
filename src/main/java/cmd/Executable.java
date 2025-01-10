@@ -23,6 +23,7 @@ public final class Executable {
     }
 
     private static final Map<String, Cmd> REGISTRY = Map.of(
-            "exit", new ExitCmd()
+            "exit", new ExitCmd(),
+            "echo", new EchoCmd()
     );
 }

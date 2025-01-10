@@ -1,5 +1,5 @@
 package cmd;
 
-public sealed interface Cmd permits ExitCmd, NotFoundCmd {
+public sealed interface Cmd permits ExitCmd, EchoCmd, NotFoundCmd {
     void execute(CmdContext context);
 }
