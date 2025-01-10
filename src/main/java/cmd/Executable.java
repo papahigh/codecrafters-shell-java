@@ -111,7 +111,7 @@ public final class Executable {
             System.out.println(
                     context.argsAsString()
                             .replaceAll("'", "")
-                            .replaceAll("\\s+", "")
+                            .replaceAll("\\s+", " ")
             );
         }
     }
