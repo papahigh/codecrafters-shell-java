@@ -48,7 +48,10 @@ public final class Executable {
         public void execute(CmdContext context) throws Exception {
             Path curr = CmdState.INSTANCE.getOrDefault("PWD", Paths.get("").toAbsolutePath());
             Path next = curr.resolve(context.arg(1));
-            CmdState.INSTANCE.put("PWD", next.toRealPath().toAbsolutePath());
+            if (Files.exists(next))
+                CmdState.INSTANCE.put("PWD", next.toRealPath().toAbsolutePath());
+            else
+                System.out.println("%s: %s: No such file or directory".formatted(context.command(), next));
         }
     }
 
