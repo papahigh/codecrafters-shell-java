@@ -1,30 +1,11 @@
 package cmd;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public record CmdContext(String input, String[] args) {
 
     public String command() {
         return args[0];
-    }
-
-    public Iterator<String> argsIterator(int from) {
-        return new Iterator<>() {
-            private int index = from;
-
-            @Override
-            public boolean hasNext() {
-                return index < args.length;
-            }
-
-            @Override
-            public String next() {
-                return args[index++];
-            }
-        };
     }
 
     public String argsAsString() {
@@ -52,7 +33,8 @@ public record CmdContext(String input, String[] args) {
 
         private enum State {
             DEFAULT_PARSE,
-            SINGLE_QUOTE
+            SINGLE_QUOTE,
+            DOUBLE_QUOTE,
         }
 
         String[] parse(String input) {
@@ -63,35 +45,49 @@ public record CmdContext(String input, String[] args) {
         }
 
         private void consume(char c) {
-            if (Character.isWhitespace(c)) {
-                if (state == State.SINGLE_QUOTE)
-                    sb.append(c);
-                else
-                    flush();
-            } else if (c == '\'') {
-                if (state == State.SINGLE_QUOTE) {
-                    state = State.DEFAULT_PARSE;
-                    flush();
-                } else {
-                    state = State.SINGLE_QUOTE;
+            switch (c) {
+                case ' ':
+                    if (inQuotes()) sb.append(c);
+                    else flush();
+                    break;
+
+                case '"': {
+                    switch (state) {
+                        case SINGLE_QUOTE -> sb.append(c);
+                        case DOUBLE_QUOTE -> resetAndFlush();
+                        default -> state = State.DOUBLE_QUOTE;
+                    }
+                    break;
                 }
-            } else {
-                sb.append(c);
+                case '\'': {
+                    switch (state) {
+                        case DOUBLE_QUOTE -> sb.append(c);
+                        case SINGLE_QUOTE -> resetAndFlush();
+                        default -> state = State.SINGLE_QUOTE;
+                    }
+                    break;
+                }
+                default: {
+                    sb.append(c);
+                    break;
+                }
             }
+        }
+
+        private void resetAndFlush() {
+            state = State.DEFAULT_PARSE;
+            flush();
         }
 
         private void flush() {
             if (!sb.isEmpty()) {
-                if (state == State.SINGLE_QUOTE) {
-                    sb.insert(0, '\'');
-                    args.addAll(Arrays.asList(sb.toString().split("\\s+")));
-                } else {
-                    args.add(sb.toString());
-                }
+                args.add(sb.toString());
                 sb = new StringBuilder();
             }
-            state = State.DEFAULT_PARSE;
+        }
+
+        private boolean inQuotes() {
+            return EnumSet.of(State.SINGLE_QUOTE, State.DOUBLE_QUOTE).contains(state);
         }
     }
-
 }

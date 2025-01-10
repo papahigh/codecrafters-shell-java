@@ -113,10 +113,10 @@ public final class Executable {
 
         private String render(String input) {
             var sb = new StringBuilder();
-            boolean quotes = false, spaced = false;
+            boolean sQuotes = false, dQuotes = false, spaced = false;
             for (char c : input.toCharArray()) {
                 if (Character.isWhitespace(c)) {
-                    if (!quotes) {
+                    if (!sQuotes && !dQuotes) {
                         if (!spaced) {
                             sb.append(c);
                             spaced = true;
@@ -124,8 +124,14 @@ public final class Executable {
                     } else {
                         sb.append(c);
                     }
+                } else if (c == '"') {
+                    if (sQuotes) {
+                        sb.append(c);
+                    } else dQuotes = !dQuotes;
                 } else if (c == '\'') {
-                    quotes = !quotes;
+                    if (dQuotes) {
+                        sb.append(c);
+                    } else sQuotes = !sQuotes;
                 } else {
                     sb.append(c);
                     spaced = false;
