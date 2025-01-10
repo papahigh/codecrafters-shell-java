@@ -1,7 +1,5 @@
 package cmd;
 
-import java.util.Map;
-
 public final class Executable {
 
     private final Cmd cmd;
@@ -18,12 +16,7 @@ public final class Executable {
 
     public static Executable of(String input) {
         var context = CmdContext.of(input);
-        var command = REGISTRY.getOrDefault(context.command(), new NotFoundCmd());
+        var command = CmdRegistry.getCmd(context.command());
         return new Executable(command, context);
     }
-
-    private static final Map<String, Cmd> REGISTRY = Map.of(
-            "exit", new ExitCmd(),
-            "echo", new EchoCmd()
-    );
 }
