@@ -13,7 +13,7 @@ public final class TypeCmd implements Cmd {
 
         boolean isBuiltin = CmdRegistry.hasCmd(context.arg(1));
         if (isBuiltin) {
-            System.out.println("%s is a shell builtin%n".formatted(context.arg(1)));
+            System.out.println("%s is a shell builtin".formatted(context.arg(1)));
             return;
         }
 
