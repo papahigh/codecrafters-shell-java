@@ -47,7 +47,7 @@ public final class Executable {
         @Override
         public void execute(CmdContext context) throws Exception {
             Path curr = CmdState.INSTANCE.getOrDefault("PWD", Paths.get("").toAbsolutePath());
-            Path next = curr.resolve(context.arg(1).replace("~", System.getProperty("user.home")));
+            Path next = curr.resolve(context.arg(1).replace("~", System.getenv("HOME")));
             if (Files.exists(next))
                 CmdState.INSTANCE.put("PWD", next.toRealPath().toAbsolutePath());
             else
