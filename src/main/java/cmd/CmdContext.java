@@ -8,14 +8,14 @@ public record CmdContext(String input, String[] args) {
         return args[0];
     }
 
-    public String argumentsAsString() {
+    public String argsAsString() {
         return input.substring(command().length() + 1);
     }
 
-    public Iterable<String> arguments() {
+    public Iterable<String> iterator(int from) {
         return () -> new Iterator<>() {
 
-            private int index = 1;
+            private int index = from;
 
             @Override
             public boolean hasNext() {
@@ -29,11 +29,11 @@ public record CmdContext(String input, String[] args) {
         };
     }
 
-    public String argument(int i) {
+    public String arg(int i) {
         return args[i];
     }
 
-    public int argumentAsInt(int i) {
+    public int argAsInt(int i) {
         return Integer.parseInt(args[i]);
     }
 

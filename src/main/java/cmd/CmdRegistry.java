@@ -4,7 +4,7 @@ import java.util.Map;
 
 public final class CmdRegistry {
 
-    private static final Cmd NOT_FOUND_CMD = new NotFoundCmd();
+    private static final Cmd NOT_FOUND = new NotFoundCmd();
     private static final Map<String, Cmd> REGISTRY = Map.of(
             "exit", new ExitCmd(),
             "echo", new EchoCmd(),
@@ -12,7 +12,7 @@ public final class CmdRegistry {
     );
 
     public static Cmd getCmd(String command) {
-        return REGISTRY.getOrDefault(command, NOT_FOUND_CMD);
+        return REGISTRY.getOrDefault(command, NOT_FOUND);
     }
 
     public static boolean hasCmd(String command) {
