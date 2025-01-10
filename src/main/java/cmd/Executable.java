@@ -112,9 +112,11 @@ public final class Executable {
         }
 
         private String render(String input) {
-            var sb = new StringBuilder();
             boolean sQuotes = false, dQuotes = false, escape = false, spaced = false;
-            for (char c : input.toCharArray()) {
+            char[] data = input.toCharArray();
+            var sb = new StringBuilder();
+            for (int i = 0; i < data.length; i++) {
+                char c = data[i];
                 switch (c) {
                     case ' ': {
                         if (!sQuotes && !dQuotes && !escape) {
