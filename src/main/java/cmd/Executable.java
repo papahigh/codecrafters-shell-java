@@ -108,12 +108,29 @@ public final class Executable {
     static final class EchoCmd implements Cmd {
         @Override
         public void execute(CmdContext context) {
-            var it = context.argsIterator(1);
-            while (it.hasNext()) {
-                System.out.print(it.next());
-                if (it.hasNext()) System.out.print(' ');
+            System.out.println(render(context.argsAsString()));
+        }
+
+        private String render(String input) {
+            var sb = new StringBuilder();
+            boolean quotes = false, spaced = false;
+            for (char c : input.toCharArray()) {
+                if (Character.isWhitespace(c)) {
+                    if (!quotes) {
+                        if (!spaced) {
+                            sb.append(c);
+                            spaced = true;
+                        }
+                    } else {
+                        sb.append(c);
+                    }
+                } else if (c == '\'') {
+                    quotes = !quotes;
+                } else {
+                    sb.append(c);
+                }
             }
-            System.out.println();
+            return sb.toString();
         }
     }
 
