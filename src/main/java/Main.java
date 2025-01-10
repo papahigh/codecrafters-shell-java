@@ -7,6 +7,7 @@ public class Main {
 
         Scanner scanner = new Scanner(System.in);
 
+        //noinspection InfiniteLoopStatement
         while (true) {
             System.out.print("$ ");
             String input = scanner.nextLine();

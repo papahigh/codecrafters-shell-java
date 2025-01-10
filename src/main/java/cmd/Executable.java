@@ -125,18 +125,21 @@ public final class Executable {
                         } else {
                             sb.append(c);
                         }
+                        escape = false;
                         break;
                     }
                     case '"': {
                         if (sQuotes || escape) {
                             sb.append(c);
                         } else dQuotes = !dQuotes;
+                        escape = false;
                         break;
                     }
                     case '\'': {
                         if (dQuotes || escape) {
                             sb.append(c);
                         } else sQuotes = !sQuotes;
+                        escape = false;
                         break;
                     }
                     case '\\': {
