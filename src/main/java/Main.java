@@ -1,18 +1,23 @@
-import cmd.Executable;
+import shell.Session;
+import shell.Command;
 
 import java.util.Scanner;
 
+
 public class Main {
+
     public static void main(String[] args) throws Exception {
 
-        Scanner scanner = new Scanner(System.in);
+        var scanner = new Scanner(System.in);
+        var session = new Session();
 
-        //noinspection InfiniteLoopStatement
         while (true) {
             System.out.print("$ ");
-            String input = scanner.nextLine();
+            String line = scanner.nextLine();
 
-            Executable.of(input).execute();
+            try (var command = Command.of(session, line)) {
+                command.execute();
+            }
         }
     }
 }
