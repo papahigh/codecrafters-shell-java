@@ -36,6 +36,10 @@ public final class Command implements AutoCloseable {
         context.close();
     }
 
+    public static void initSuggest(Suggest suggest) {
+        for (var cmd : Registry.REGISTRY.keySet())
+            suggest.index(cmd);
+    }
 
     static class Registry {
 

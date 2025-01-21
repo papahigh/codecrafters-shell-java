@@ -13,6 +13,8 @@ public class Main {
         var scanner = new Scanner(suggest);
         var session = new Session();
 
+        Command.initSuggest(suggest);
+
         while (true) {
             System.out.print("$ ");
             String line = scanner.readLine();
