@@ -56,8 +56,8 @@ public final class Command implements AutoCloseable {
         }
 
         static Cmd resolve(Context context) {
+            if (context.input().isBlank()) return new DummyCmd();
             var command = context.input().command();
-            if (command.isBlank()) return new DummyCmd();
 
             boolean isBuiltin = Registry.hasCmd(command);
             if (isBuiltin) return Registry.getCmd(command);

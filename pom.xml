@@ -13,7 +13,16 @@
         <maven.compiler.target>23</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>23</java.version>
+        <jna.version>5.16.0</jna.version>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>net.java.dev.jna</groupId>
+            <artifactId>jna</artifactId>
+            <version>${jna.version}</version>
+        </dependency>
+    </dependencies>
 
     <build>
         <plugins>
@@ -31,6 +40,7 @@
                             <addClasspath>true</addClasspath>
                             <!-- This is the main class of your program which will be executed-->
                             <mainClass>Main</mainClass>
+
                         </manifest>
                     </archive>
                     <outputDirectory>${dir}</outputDirectory>
