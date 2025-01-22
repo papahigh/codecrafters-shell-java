@@ -64,7 +64,9 @@ public class Scanner {
                 case TAB -> {
                     var token = sb.substring(0, cursor);
                     var suggestion = suggest.suggest(token);
-                    if (!suggestion.isEmpty()) {
+                    if (suggestion.isEmpty()) {
+                        bell();
+                    } else {
                         var first = suggestion.firstOption();
                         var suffix = first.substring(token.length());
                         sb.insert(cursor, suffix + ' ');
@@ -106,6 +108,10 @@ public class Scanner {
             printer.print(sb);
             printer.print("\033[G");
             printer.print("\033[C".repeat(cursor + 2));
+        }
+
+        private void bell() {
+            printer.print("\u0007");
         }
     }
 
