@@ -18,8 +18,6 @@ public class Main {
         while (true) {
             String line = scanner.readLine();
 
-            if (line.isBlank()) continue;
-
             try (var command = Command.of(session, line)) {
                 command.execute();
             }
