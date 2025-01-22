@@ -14,8 +14,24 @@ public class Suggest {
         trie.index(key);
     }
 
-    private List<String> suggest(String prefix) {
+    public Result suggest(String prefix) {
         return trie.suggest(prefix);
+    }
+
+    /**
+     * A record that encapsulates the result of a suggestion operation.
+     * It consists of the longest common prefix derived from a trie structure
+     * and a list of suggestion options.
+     */
+    public record Result(String longestCommonPrefix, List<String> suggestOptions) {
+
+        static Result of(String longestCommonPrefix, List<String> options) {
+            return new Result(longestCommonPrefix, options);
+        }
+
+        static Result notFound() {
+            return new Result("", List.of());
+        }
     }
 
     private static class Trie {
@@ -25,10 +41,17 @@ public class Suggest {
             root = index(root, key.toCharArray(), key, 0);
         }
 
-        List<String> suggest(String prefix) {
+        Result suggest(String prefix) {
             var node = search(root, prefix.toCharArray(), 0);
-            if (node == null) return List.of();
-            return new ArrayList<>(node.values);
+            if (node == null) return Result.notFound();
+
+            var sb = new StringBuilder(prefix);
+            var curr = node.middle;
+            while (curr != null && curr.isCommonPrefix()) {
+                sb.append(curr.symbol);
+                curr = curr.middle;
+            }
+            return Result.of(sb.toString(), new ArrayList<>(node.values));
         }
 
         private Node index(Node node, char[] data, String value, int index) {
@@ -65,6 +88,10 @@ public class Suggest {
 
             Node(char symbol) {
                 this.symbol = symbol;
+            }
+
+            boolean isCommonPrefix() {
+                return left == null && right == null;
             }
         }
     }
