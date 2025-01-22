@@ -16,7 +16,6 @@ public class Main {
         Command.initSuggest(suggest);
 
         while (true) {
-            System.out.print("$ ");
             String line = scanner.readLine();
 
             if (line.isBlank()) continue;

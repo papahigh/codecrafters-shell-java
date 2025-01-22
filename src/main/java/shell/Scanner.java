@@ -1,16 +1,17 @@
 package shell;
 
-
 import com.sun.jna.Library;
 import com.sun.jna.Native;
 import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 import shell.Scanner.Lifecycle.NativeLibrary.Termios;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.Arrays;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static shell.Scanner.Lifecycle.Constants.*;
+import static shell.Scanner.KeyCodes.*;
 
 public class Scanner {
 
@@ -24,20 +25,98 @@ public class Scanner {
     public String readLine() throws IOException {
         lifecycle.beforeInput();
         try {
-            var sb = new StringBuilder();
-            char c;
-            // TODO: https://viewsourcecode.org/snaptoken/kilo/03.rawInputAndOutput.html
-            while ((c = (char) System.in.read()) != '\n') {
-                System.out.print(c);
-                sb.append(c);
-            }
-            System.out.print("\n\r");
-            return sb.toString();
+            return new ConsoleReader().readLine();
         } finally {
             lifecycle.afterInput();
         }
     }
 
+    private class ConsoleReader {
+
+        final InputStreamReader reader = new InputStreamReader(System.in, UTF_8);
+        final PrintStream printer = System.out;
+
+        final StringBuilder sb = new StringBuilder();
+        int cursor = 0;
+
+        ConsoleReader() {
+            paint();
+        }
+
+        String readLine() throws IOException {
+
+            int key;
+            while ((key = reader.read()) != '\n') {
+                onKeyDown(key);
+                paint();
+            }
+
+            printer.print("\n\r");
+            return sb.toString();
+        }
+
+        private void onKeyDown(int key) throws IOException {
+            switch (key) {
+                case BACKSPACE -> {
+                    if (cursor > 0)
+                        sb.deleteCharAt(--cursor);
+                }
+                case TAB -> {
+                    var token = sb.substring(0, cursor);
+                    var suggestion = suggest.suggest(token);
+                    if (!suggestion.isEmpty()) {
+                        var first = suggestion.firstOption();
+                        var suffix = first.substring(token.length());
+                        sb.insert(cursor, suffix + ' ');
+                        cursor += suffix.length() + 1;
+                    }
+                }
+                case ESCAPE -> {
+                    if (reader.read() == '[') {
+                        switch (reader.read()) {
+                            case CURSOR_LEFT -> {
+                                if (cursor > 0)
+                                    cursor--;
+                            }
+                            case CURSOR_RIGHT -> {
+                                if (cursor < sb.length())
+                                    cursor++;
+                            }
+                        }
+                    }
+                }
+                case CTRLC -> {
+                    printer.print("\n\r^C");
+                    System.exit(0);
+                }
+                default -> {
+                    if (cursor < sb.length())
+                        sb.insert(cursor, (char) key);
+                    else
+                        sb.append((char) key);
+
+                    cursor++;
+                }
+            }
+        }
+
+        private void paint() {
+            printer.print("\033[2K\033[G");
+            printer.print("$ ");
+            printer.print(sb);
+            printer.print("\033[G");
+            printer.print("\033[C".repeat(cursor + 2));
+        }
+    }
+
+    interface KeyCodes {
+        int ESCAPE = 27;
+        int BACKSPACE = 127;
+        int TAB = 9;
+        int CURSOR_LEFT = 68;
+        int CURSOR_RIGHT = 67;
+        int CTRLC = 3;
+    }
 
     static class Lifecycle {
 
@@ -131,7 +210,6 @@ public class Scanner {
         interface Constants {
             int TCSAFLUSH = 2;
             int STDIN_FILENO = 0;
-
 
             // c_iflag
             int IGNBRK = 1;

@@ -25,6 +25,14 @@ public class Suggest {
      */
     public record Result(String longestCommonPrefix, List<String> suggestOptions) {
 
+        public String firstOption() {
+            return suggestOptions.getFirst();
+        }
+
+        public boolean isEmpty() {
+            return suggestOptions.isEmpty();
+        }
+
         static Result of(String longestCommonPrefix, List<String> options) {
             return new Result(longestCommonPrefix, options);
         }
