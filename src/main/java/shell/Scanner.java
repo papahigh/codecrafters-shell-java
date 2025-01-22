@@ -35,8 +35,8 @@ public class Scanner {
 
     private class ConsoleReader {
 
-        final InputStreamReader reader = new InputStreamReader(System.in, UTF_8);
-        final PrintStream printer = System.out;
+        static final InputStreamReader reader = new InputStreamReader(System.in, UTF_8);
+        static final PrintStream printer = System.out;
 
         final StringBuilder sb = new StringBuilder();
 
