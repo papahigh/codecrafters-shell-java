@@ -111,7 +111,7 @@ public class Scanner {
         }
 
         private void bell() {
-            printer.print("\u0007");
+            printer.print("\007");
         }
     }
 
