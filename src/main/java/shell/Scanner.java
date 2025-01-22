@@ -6,12 +6,14 @@ import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
 import shell.Scanner.Lifecycle.NativeLibrary.Termios;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.util.Arrays;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
-import static shell.Scanner.Lifecycle.Constants.*;
 import static shell.Scanner.KeyCodes.*;
+import static shell.Scanner.Lifecycle.Constants.*;
 
 public class Scanner {
 
@@ -51,7 +53,7 @@ public class Scanner {
                 paint();
             }
 
-            printer.print("\n\r");
+            newLine();
             return sb.toString();
         }
 
@@ -64,13 +66,28 @@ public class Scanner {
                 case TAB -> {
                     var token = sb.substring(0, cursor);
                     var suggestion = suggest.suggest(token);
-                    if (suggestion.isEmpty()) {
-                        bell();
-                    } else {
-                        var first = suggestion.firstOption();
-                        var suffix = first.substring(token.length());
-                        sb.insert(cursor, suffix + ' ');
-                        cursor += suffix.length() + 1;
+
+                    switch (suggestion.count()) {
+                        case 0 -> bell();
+                        case 1 -> {
+                            var first = suggestion.firstOption();
+                            var suffix = first.substring(token.length());
+                            sb.insert(cursor, suffix + ' ');
+                            cursor += suffix.length() + 1;
+                        }
+                        default -> {
+                            bell();
+
+                            int nextKey = reader.read();
+                            if (nextKey == TAB) {
+                                newLine();
+                                var allOptions = String.join("  ", suggestion.suggestOptions());
+                                printer.print(allOptions);
+                                newLine();
+                            } else {
+                                onKeyDown(nextKey);
+                            }
+                        }
                     }
                 }
                 case ESCAPE -> {
@@ -108,6 +125,10 @@ public class Scanner {
             printer.print(sb);
             printer.print("\033[G");
             printer.print("\033[C".repeat(cursor + 2));
+        }
+
+        private void newLine() {
+            printer.print("\n\r");
         }
 
         private void bell() {

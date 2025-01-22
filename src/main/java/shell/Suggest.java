@@ -29,8 +29,8 @@ public class Suggest {
             return suggestOptions.getFirst();
         }
 
-        public boolean isEmpty() {
-            return suggestOptions.isEmpty();
+        public int count() {
+            return suggestOptions.size();
         }
 
         static Result of(String longestCommonPrefix, List<String> options) {
