@@ -27,10 +27,6 @@ record Input(String line, List<String> args, List<Redirect> redirects) {
         return line.substring(command().length() + 1, redirects.isEmpty() ? line.length() : redirects.get(0).pos);
     }
 
-    boolean isBlank() {
-        return args.isEmpty();
-    }
-
     static Input of(String line) {
         var parser = new Parser().parse(line);
         return new Input(line, parser.args, parser.redirects);
