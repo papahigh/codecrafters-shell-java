@@ -2,6 +2,8 @@ package shell;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 
 public class Suggest {
@@ -16,7 +18,7 @@ public class Suggest {
         return trie.suggest(prefix);
     }
 
-    static class Trie {
+    private static class Trie {
         private Node root;
 
         void index(String key) {
@@ -25,34 +27,12 @@ public class Suggest {
 
         List<String> suggest(String prefix) {
             var node = search(root, prefix.toCharArray(), 0);
-            return node == null ? List.of() : node.values;
-        }
-
-        private Node search(Node node, char[] data, int index) {
-
-            if (index == data.length || node == null) {
-                return node;
-            }
-
-            if (data[index] > node.symbol) {
-                return search(node.right, data, index);
-            }
-
-            if (data[index] < node.symbol) {
-                return search(node.left, data, index);
-            }
-
-            if (index == data.length - 1) {
-                return node;
-            }
-
-            return search(node.middle, data, index + 1);
+            if (node == null) return List.of();
+            return new ArrayList<>(node.values);
         }
 
         private Node index(Node node, char[] data, String value, int index) {
-            if (node == null) {
-                node = new Node(data[index]);
-            }
+            if (node == null) node = new Node(data[index]);
 
             if (data[index] > node.symbol) {
                 node.right = index(node.right, data, value, index);
@@ -67,10 +47,21 @@ public class Suggest {
             return node;
         }
 
-        static class Node {
-            private final char symbol;
-            private Node left, right, middle;
-            private final List<String> values = new ArrayList<>();
+        private Node search(Node node, char[] data, int index) {
+            if (index == data.length || node == null) return node;
+
+            if (data[index] > node.symbol) return search(node.right, data, index);
+            if (data[index] < node.symbol) return search(node.left, data, index);
+            if (index == data.length - 1) return node;
+
+            return search(node.middle, data, index + 1);
+        }
+
+        private static class Node {
+            final Set<String> values = new TreeSet<>();
+            final char symbol;
+
+            Node left, right, middle;
 
             Node(char symbol) {
                 this.symbol = symbol;
