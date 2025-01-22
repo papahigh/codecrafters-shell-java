@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -39,11 +38,11 @@ public final class Command implements AutoCloseable {
     }
 
     public static void initSuggest(Suggest suggest) {
-        for (var cmd : Registry.REGISTRY.keySet())
-            suggest.index(cmd);
 
-        for (var cmd : Utils.listPathCmd())
-            suggest.index(cmd);
+        var builtinCmds = Registry.REGISTRY.keySet().stream();
+        var pathCommands = Utils.listPathExecutables();
+
+        Stream.concat(builtinCmds, pathCommands).forEach(suggest::index);
     }
 
     static class Registry {
@@ -227,14 +226,13 @@ public final class Command implements AutoCloseable {
     }
 
     static class Utils {
-        static List<String> listPathCmd() {
+        static Stream<String> listPathExecutables() {
             return Arrays.stream(System.getenv("PATH").split(":"))
                     .map(Paths::get)
                     .flatMap(Utils::list)
                     .filter(Files::isExecutable)
                     .map(Path::getFileName)
-                    .map(Path::toString)
-                    .toList();
+                    .map(Path::toString);
         }
 
         static Optional<Path> getPathCmd(String command) {
