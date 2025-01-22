@@ -5,8 +5,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 
 public final class Command implements AutoCloseable {
@@ -39,6 +41,9 @@ public final class Command implements AutoCloseable {
     public static void initSuggest(Suggest suggest) {
         for (var cmd : Registry.REGISTRY.keySet())
             suggest.index(cmd);
+
+        for (var cmd : Utils.listPathCmd())
+            suggest.index(cmd);
     }
 
     static class Registry {
@@ -60,7 +65,6 @@ public final class Command implements AutoCloseable {
         }
 
         static Cmd resolve(Context context) {
-            if (context.input().isBlank()) return new DummyCmd();
             var command = context.input().command();
 
             boolean isBuiltin = Registry.hasCmd(command);
@@ -141,7 +145,7 @@ public final class Command implements AutoCloseable {
 
         @Override
         public void execute(Context context, Session session) throws IOException {
-            context.output().error("%s: command not found".formatted(context.input().line()));
+            context.output().error("%s: command not found".formatted(context.input().line().trim()));
         }
     }
 
@@ -223,12 +227,30 @@ public final class Command implements AutoCloseable {
     }
 
     static class Utils {
+        static List<String> listPathCmd() {
+            return Arrays.stream(System.getenv("PATH").split(":"))
+                    .map(Paths::get)
+                    .flatMap(Utils::list)
+                    .filter(Files::isExecutable)
+                    .map(Path::getFileName)
+                    .map(Path::toString)
+                    .toList();
+        }
+
         static Optional<Path> getPathCmd(String command) {
             return Arrays.stream(System.getenv("PATH").split(":"))
                     .map(Paths::get)
                     .map(p -> p.resolve(command))
                     .filter(Files::exists)
                     .findFirst();
+        }
+
+        static Stream<Path> list(Path directory) {
+            try {
+                return Files.list(directory);
+            } catch (IOException e) {
+                return Stream.empty();
+            }
         }
     }
 }
