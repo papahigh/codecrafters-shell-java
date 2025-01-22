@@ -39,7 +39,10 @@ public class Scanner {
         final PrintStream printer = System.out;
 
         final StringBuilder sb = new StringBuilder();
+
+        boolean done = false;
         int cursor = 0;
+
 
         ConsoleReader() {
             paint();
@@ -47,9 +50,8 @@ public class Scanner {
 
         String readLine() throws IOException {
 
-            int key;
-            while ((key = reader.read()) != '\n') {
-                onKeyDown(key);
+            while (!done) {
+                onKeyDown(reader.read());
                 paint();
             }
 
@@ -63,6 +65,7 @@ public class Scanner {
                     if (cursor > 0)
                         sb.deleteCharAt(--cursor);
                 }
+                case '\n' -> done = true;
                 case TAB -> {
                     var token = sb.substring(0, cursor);
                     var suggestion = suggest.suggest(token);
@@ -81,8 +84,8 @@ public class Scanner {
                             int nextKey = reader.read();
                             if (nextKey == TAB) {
                                 newLine();
-                                var allOptions = String.join("  ", suggestion.suggestOptions());
-                                printer.print(allOptions);
+                                var all = String.join("  ", suggestion.suggestOptions());
+                                printer.print(all);
                                 newLine();
                             } else {
                                 onKeyDown(nextKey);
