@@ -57,6 +57,7 @@ public class Suggest {
             var curr = node.middle;
             while (curr != null && curr.isCommonPrefix()) {
                 sb.append(curr.symbol);
+                if (curr.hit) break;
                 curr = curr.middle;
             }
             return Result.of(sb.toString(), new ArrayList<>(node.values));
@@ -72,6 +73,8 @@ public class Suggest {
             } else {
                 if (index < data.length - 1)
                     node.middle = index(node.middle, data, value, index + 1);
+                else
+                    node.hit = true;
                 node.values.add(value);
             }
 
@@ -93,6 +96,7 @@ public class Suggest {
             final char symbol;
 
             Node left, right, middle;
+            boolean hit;
 
             Node(char symbol) {
                 this.symbol = symbol;

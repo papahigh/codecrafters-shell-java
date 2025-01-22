@@ -81,6 +81,12 @@ public class Scanner {
                         default -> {
                             bell();
 
+                            var prefix = suggestion.longestCommonPrefix();
+                            var suffix = prefix.substring(token.length());
+                            sb.insert(cursor, suffix);
+                            cursor += suffix.length();
+                            paint();
+
                             int nextKey = reader.read();
                             if (nextKey == TAB) {
                                 newLine();
